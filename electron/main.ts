@@ -10,31 +10,54 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export const RECORDINGS_DIR = path.join(app.getPath('userData'), 'recordings')
 
+let mainWindow: BrowserWindow | null = null
+let sourceSelectorWindow: BrowserWindow | null = null
+let tray: Tray | null = null
+let selectedSourceName = 'Screen Recording'
 
 async function ensureRecordingsDir() {
   try {
     await fs.mkdir(RECORDINGS_DIR, { recursive: true })
-      let icon = nativeImage.createFromPath(iconPath);
-  icon = icon.resize({ width: 24, height: 24, quality: 'best' });
-  tray = new Tray(icon);
-  updateTrayMenu();
+  } catch (err) {
+    console.error('Failed to create recordings directory:', err)
+  }
+}
+
+function getIconPath(): string {
+  const isDev = !app.isPackaged
+  if (isDev) {
+    return path.join(__dirname, '..', 'icons', 'icons', 'png', '128x128.png')
+  }
+  return path.join(process.resourcesPath, 'icons', 'png', '128x128.png')
+}
+
+function createTray() {
+  const iconPath = getIconPath()
+  let icon = nativeImage.createFromPath(iconPath)
+  icon = icon.resize({ width: 24, height: 24, quality: 'best' })
+  tray = new Tray(icon)
+  updateTrayMenu()
 }
 
 function updateTrayMenu() {
-  if (!tray) return;
+  if (!tray) return
   const menuTemplate = [
     {
       label: 'Stop Recording',
       click: () => {
         if (mainWindow && !mainWindow.isDestroyed()) {
-          mainWindow.webContents.send('stop-recording-from-tray');
+          mainWindow.webContents.send('stop-recording-from-tray')
         }
       }
     }
-  ];
-  const contextMenu = Menu.buildFromTemplate(menuTemplate);
-  tray.setContextMenu(contextMenu);
-  tray.setToolTip(`Recording: ${selectedSourceName}`);
+  ]
+  const contextMenu = Menu.buildFromTemplate(menuTemplate)
+  tray.setContextMenu(contextMenu)
+  tray.setToolTip(`Recording: ${selectedSourceName}`)
+}
+
+function createWindow() {
+  mainWindow = createHudOverlayWindow()
 }
 
 function createEditorWindowWrapper() {
@@ -59,18 +82,18 @@ app.on('window-all-closed', () => {
   // On Windows/Linux, quit when all windows are closed
   if (process.platform !== 'darwin') {
     if (tray) {
-      tray.destroy();
-      tray = null;
+      tray.destroy()
+      tray = null
     }
-    app.quit();
+    app.quit()
   }
 })
 
 app.on('before-quit', () => {
   // Clean up tray on quit
   if (tray) {
-    tray.destroy();
-    tray = null;
+    tray.destroy()
+    tray = null
   }
 })
 
@@ -81,8 +104,6 @@ app.on('activate', () => {
     createWindow()
   }
 })
-
-
 
 // Register all IPC handlers when app is ready
 app.whenReady().then(async () => {
@@ -97,15 +118,15 @@ app.whenReady().then(async () => {
     (recording: boolean, sourceName: string) => {
       selectedSourceName = sourceName
       if (recording) {
-        if (!tray) createTray();
-        updateTrayMenu();
-        if (mainWindow) mainWindow.minimize();
+        if (!tray) createTray()
+        updateTrayMenu()
+        if (mainWindow) mainWindow.minimize()
       } else {
         if (tray) {
-          tray.destroy();
-          tray = null;
+          tray.destroy()
+          tray = null
         }
-        if (mainWindow) mainWindow.restore();
+        if (mainWindow) mainWindow.restore()
       }
     }
   )
