@@ -3,10 +3,25 @@
 </p>
 
 
-# <p align="center">OpenScreen</p>
+# <p align="center">OpenScreen (Modified Fork)</p>
 
 <p align="center"><strong>OpenScreen is your free, open-source alternative to Screen Studio (sort of).</strong></p>
 
+> **🔀 This is a modified fork of the original [OpenScreen](https://github.com/siddharthvaddem/openscreen) by siddharthvaddem.**
+> 
+> This version includes experimental features and modifications that may not work perfectly. Use at your own risk!
+
+## What's different in this fork?
+
+- 🖱️ **Enhanced cursor system** - macOS-style pointer cursor, glow effects, highlight/spotlight, auto-hide
+- 📐 **Padding control** - Adjustable video padding from background (0-40%)
+- 🎨 **Cursor customization** - Size, color, style, click ripples, motion blur trail
+- ⚡ **Spring physics** - Smooth cursor animation with configurable smoothness
+- 🧹 **Cleaner codebase** - Removed debug logs for production
+
+**⚠️ WARNING: This fork is experimental and some features may be unstable or broken. Not all original features have been tested after modifications.**
+
+---
 
 If you don't want to pay $29/month for Screen Studio but want a much simpler version that does what most people seem to need, making beautiful product demos and walkthroughs, here's a free-to-use app for you. OpenScreen does not offer all Screen Studio features, but covers the basics well!
 
